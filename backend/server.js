@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const pool = require("./config/db");
+const authRoutes = require("./routes/auth.routes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,6 +20,9 @@ pool.getConnection()
 app.get("/", (req, res) => {
     res.send("Bienvenue sur l'API Blolab !");
 });
+
+// Routes API
+app.use("/api", authRoutes);
 
 // Lancement du serveur
 app.listen(PORT, () => {
