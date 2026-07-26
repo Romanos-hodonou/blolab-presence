@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace personnel — BloLab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/Styles/dashboard.css">
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+</head>
+<body>
+
+  <div class="dash">
+
+    <header class="dash-header">
+      <a href="dashboard.html" class="wordmark" aria-label="Accueil BloLab">
+        <svg viewBox="0 0 28 28" class="wordmark__icon" aria-hidden="true">
+          <polygon points="14,2 25,8 25,20 14,26 3,20 3,8" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <circle cx="14" cy="14" r="3" fill="currentColor"/>
+          <line x1="14" y1="2" x2="14" y2="11" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="25" y1="8" x2="16.5" y2="12.5" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="3" y1="8" x2="11.5" y2="12.5" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        BloLab
+      </a>
+
+      <div class="dash-header__right">
+        <span class="dash-user" id="dash-user">Personnel</span>
+        <a href="#" class="logout-link" id="logout-link">Se déconnecter</a>
+      </div>
+    </header>
+
+    <main class="dash-main">
+      <section class="dash-welcome">
+        <span class="eyebrow">BL / 04 — ESPACE PERSONNEL</span>
+        <h1 id="welcome-title">Bonjour.</h1>
+        <p class="lede">Vue d’ensemble de l’atelier pour aujourd’hui.</p>
+      </section>
+
+      <section class="dash-grid">
+
+        <div class="dash-card" id="access-status-card">
+          <span class="dash-card__icon">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6"/><path d="M14 14h3v3h-3zM20 14v3M14 20h3M20 20v0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <h2>Mon accès aujourd’hui</h2>
+          <p id="access-status-text">Chargement…</p>
+        </div>
+
+        <div class="dash-card">
+          <span class="dash-card__icon">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="1.6"/><line x1="8" y1="3" x2="8" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <h2>Réservations du jour</h2>
+          <ul class="dash-list">
+            <li><span>Découpe laser</span><span>09:00 – 11:00</span></li>
+            <li><span>Imprimante 3D — Salle B</span><span>11:30 – 13:00</span></li>
+            <li><span>Formation Arduino</span><span>15:00 – 17:00</span></li>
+          </ul>
+        </div>
+
+        <div class="dash-card">
+          <span class="dash-card__icon">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="17.5" cy="9" r="2.4" stroke="currentColor" stroke-width="1.6"/><path d="M15 20c.2-2.4 1.8-4.3 4-4.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </span>
+          <h2>Membres actifs</h2>
+          <p class="dash-stat">128</p>
+          <p class="dash-stat__caption">apprenants inscrits ce trimestre</p>
+        </div>
+
+        <div class="dash-card">
+          <span class="dash-card__icon">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="7" cy="19" r="1.6" stroke="currentColor" stroke-width="1.6"/><circle cx="17" cy="19" r="1.6" stroke="currentColor" stroke-width="1.6"/><line x1="2" y1="11" x2="22" y2="11" stroke="currentColor" stroke-width="1.6"/></svg>
+          </span>
+          <h2>BloBus</h2>
+          <p>Prochaine sortie : Allada — Tech4Girls, jeudi.</p>
+        </div>
+
+      </section>
+
+      <section class="admin-panel">
+        <div class="admin-panel__head">
+          <div>
+            <span class="eyebrow">BL / 05</span>
+            <h2>Présences du jour — Apprenants</h2>
+            <p class="lede">Heure d’arrivée relevée au scan du point de contrôle.</p>
+          </div>
+          <button type="button" class="btn-ghost" id="print-apprenants-btn">Imprimer la liste</button>
+        </div>
+        <table class="member-table" id="attendance-apprenants-table">
+          <thead>
+            <tr><th>Nom</th><th>Prénom</th><th>Heure d’arrivée</th></tr>
+          </thead>
+          <tbody id="attendance-apprenants-body"></tbody>
+        </table>
+        <p class="member-empty" id="attendance-apprenants-empty" hidden>Aucun apprenant enregistré.</p>
+      </section>
+
+      <section class="admin-panel">
+        <div class="admin-panel__head">
+          <div>
+            <span class="eyebrow">BL / 06</span>
+            <h2>Présences du jour — Personnel</h2>
+            <p class="lede">Heure d’arrivée (1ᵉʳ scan) et heure de départ (2ᵉ scan).</p>
+          </div>
+          <button type="button" class="btn-ghost" id="print-personnel-btn">Imprimer la liste</button>
+        </div>
+        <table class="member-table" id="attendance-personnel-table">
+          <thead>
+            <tr><th>Nom</th><th>Prénom</th><th>Heure d’arrivée</th><th>Heure de départ</th></tr>
+          </thead>
+          <tbody id="attendance-personnel-body"></tbody>
+        </table>
+        <p class="member-empty" id="attendance-personnel-empty" hidden>Aucun membre du personnel enregistré.</p>
+      </section>
+
+      <section class="admin-panel" id="admin-panel" hidden>
+        <div class="admin-panel__head">
+          <div>
+            <span class="eyebrow">ACCÈS ADMINISTRATEUR</span>
+            <h2>Gestion des membres</h2>
+            <p class="lede">Ajoutez un compte directement — la personne n’a pas besoin de passer par l’inscription.</p>
+          </div>
+          <button type="button" class="btn-primary btn-primary--small" id="add-member-btn">+ Ajouter un membre</button>
+        </div>
+
+        <form id="member-form" class="member-form" hidden novalidate>
+          <input type="hidden" id="member-id" value="">
+          <div class="member-form__row">
+            <div class="field">
+              <label for="member-name">Nom complet</label>
+              <input type="text" id="member-name" required>
+            </div>
+            <div class="field">
+              <label for="member-email">E-mail</label>
+              <input type="email" id="member-email" required>
+            </div>
+          </div>
+          <div class="member-form__row">
+            <div class="field">
+              <label for="member-role">Rôle</label>
+              <select id="member-role">
+                <option value="apprenant">Apprenant</option>
+                <option value="personnel">Personnel</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="member-detail">Programme / poste</label>
+              <input type="text" id="member-detail" placeholder="Ex. Bootcamp, Formateur…">
+            </div>
+          </div>
+          <label class="checkbox">
+            <input type="checkbox" id="member-admin">
+            <span>Droits administrateur</span>
+          </label>
+          <div class="member-form__actions">
+            <button type="button" class="btn-ghost" id="cancel-member-btn">Annuler</button>
+            <button type="submit" class="btn-primary btn-primary--small" id="save-member-btn">Enregistrer</button>
+          </div>
+        </form>
+
+        <table class="member-table">
+          <thead>
+            <tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Détail</th><th></th></tr>
+          </thead>
+          <tbody id="member-table-body"></tbody>
+        </table>
+        <p class="member-empty" id="member-empty" hidden>Aucun membre pour l’instant — ajoutez-en un.</p>
+      </section>
+
+      <section class="admin-panel" id="qr-panel" hidden>
+        <div class="admin-panel__head">
+          <div>
+            <span class="eyebrow">ACCÈS ADMINISTRATEUR</span>
+            <h2>QR codes d’accès</h2>
+            <p class="lede">Un code par point de contrôle physique. Régénérez-le quand vous voulez — l’ancien devient aussitôt invalide. Affichez-le à l’écran ou imprimez-le.</p>
+          </div>
+        </div>
+
+        <div class="qr-grid">
+          <div class="qr-card">
+            <h3>Apprenants — devant la salle de formation</h3>
+            <div class="qr-image" id="qr-apprenant"></div>
+            <p class="qr-meta" id="qr-apprenant-meta">—</p>
+            <div class="qr-card__actions">
+              <button type="button" class="btn-ghost" data-regenerate="apprenant">Régénérer ce code</button>
+              <button type="button" class="btn-primary btn-primary--small" data-print="apprenant">Imprimer</button>
+            </div>
+          </div>
+
+          <div class="qr-card">
+            <h3>Personnel — devant les bureaux</h3>
+            <div class="qr-image" id="qr-personnel"></div>
+            <p class="qr-meta" id="qr-personnel-meta">—</p>
+            <div class="qr-card__actions">
+              <button type="button" class="btn-ghost" data-regenerate="personnel">Régénérer ce code</button>
+              <button type="button" class="btn-primary btn-primary--small" data-print="personnel">Imprimer</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/JS/dashboard.js"></script>
+</body>
+</html>

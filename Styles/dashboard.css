@@ -1,0 +1,468 @@
+/* ==========================================================================
+   BloLab — Espace personnel
+   Palette : bleu plan d'atelier + orange sécurité + vert circuit
+   Typo : Space Grotesk (titres) / Work Sans (corps) / IBM Plex Mono (data)
+   ========================================================================== */
+
+:root{
+  --blueprint-900:#0e2a33;
+  --blueprint-800:#153f4a;
+
+  --orange:#e4572e;
+  --orange-dim:#b8431f;
+  --teal:#5fc9b8;
+
+  --kraft:#f1ece1;
+  --card:#ffffff;
+  --text-dark:#1c231f;
+  --text-muted:#66716a;
+  --text-faint:#98a199;
+
+  --radius-s:6px;
+  --radius-m:12px;
+
+  --font-display:'Space Grotesk', sans-serif;
+  --font-body:'Work Sans', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family:var(--font-body);
+  color:var(--text-dark);
+  background:var(--kraft);
+  -webkit-font-smoothing:antialiased;
+}
+
+.dash{ min-height:100vh; display:flex; flex-direction:column; }
+
+/* ---------------------------------------------------------------- */
+/* Bandeau supérieur                                                   */
+/* ---------------------------------------------------------------- */
+.dash-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px clamp(20px, 5vw, 56px);
+  background:linear-gradient(165deg, var(--blueprint-800) 0%, var(--blueprint-900) 100%);
+}
+
+.wordmark{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-family:var(--font-display);
+  font-size:1.2rem;
+  font-weight:700;
+  color:#f4f7f6;
+  text-decoration:none;
+}
+.wordmark__icon{ width:24px; height:24px; color:var(--orange); }
+
+.dash-header__right{ display:flex; align-items:center; gap:18px; }
+
+.dash-user{
+  font-family:var(--font-mono);
+  font-size:.76rem;
+  letter-spacing:.04em;
+  color:rgba(234,243,241,.75);
+}
+
+.logout-link{
+  font-size:.84rem;
+  color:rgba(234,243,241,.75);
+  text-decoration:none;
+  border-bottom:1px solid transparent;
+}
+.logout-link:hover{ color:var(--teal); border-color:var(--teal); }
+.logout-link:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+
+/* ---------------------------------------------------------------- */
+/* Contenu principal                                                    */
+/* ---------------------------------------------------------------- */
+.dash-main{
+  flex:1;
+  padding:44px clamp(20px, 5vw, 56px) 64px;
+  max-width:1080px;
+  width:100%;
+  margin:0 auto;
+}
+
+.dash-welcome{ margin-bottom:36px; }
+
+.eyebrow{
+  display:inline-block;
+  font-family:var(--font-mono);
+  font-size:.7rem;
+  letter-spacing:.14em;
+  color:var(--orange-dim);
+  margin-bottom:14px;
+}
+
+.dash-welcome h1{
+  font-family:var(--font-display);
+  font-size:clamp(1.7rem, 3vw, 2.2rem);
+  font-weight:700;
+  margin:0 0 8px;
+}
+
+.dash-welcome .lede{
+  margin:0;
+  font-size:.98rem;
+  color:var(--text-muted);
+}
+
+/* ---------------------------------------------------------------- */
+/* Grille de cartes                                                     */
+/* ---------------------------------------------------------------- */
+.dash-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:20px;
+}
+
+.dash-card{
+  background:var(--card);
+  border-radius:var(--radius-m);
+  padding:28px;
+  box-shadow:0 20px 50px -32px rgba(14,42,51,.35);
+  text-decoration:none;
+  color:inherit;
+  display:block;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+
+.dash-card--primary{
+  background:linear-gradient(155deg, var(--blueprint-800), var(--blueprint-900));
+  color:#eaf3f1;
+}
+
+a.dash-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 26px 60px -30px rgba(14,42,51,.45);
+}
+
+.dash-card__icon{
+  display:inline-flex;
+  width:38px;
+  height:38px;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  background:rgba(228,87,46,.1);
+  color:var(--orange-dim);
+  margin-bottom:16px;
+}
+.dash-card--primary .dash-card__icon{
+  background:rgba(95,201,184,.14);
+  color:var(--teal);
+}
+.dash-card__icon svg{ width:20px; height:20px; }
+
+.dash-card h2{
+  font-family:var(--font-display);
+  font-size:1.1rem;
+  font-weight:700;
+  margin:0 0 8px;
+}
+
+.dash-card p{
+  margin:0;
+  font-size:.88rem;
+  line-height:1.5;
+  color:var(--text-muted);
+}
+.dash-card--primary p{ color:rgba(234,243,241,.75); }
+
+.dash-card__cta{
+  display:inline-block;
+  margin-top:16px;
+  font-family:var(--font-mono);
+  font-size:.75rem;
+  letter-spacing:.04em;
+  color:var(--teal);
+}
+
+.dash-list{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.dash-list li{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  font-size:.86rem;
+  padding-bottom:10px;
+  border-bottom:1px solid #eceae1;
+  color:var(--text-dark);
+}
+.dash-list li:last-child{ border-bottom:none; padding-bottom:0; }
+.dash-list li span:last-child{
+  font-family:var(--font-mono);
+  font-size:.78rem;
+  color:var(--text-muted);
+}
+
+.dash-stat{
+  font-family:var(--font-display);
+  font-size:2.4rem;
+  font-weight:700;
+  margin:0;
+  color:var(--text-dark);
+}
+.dash-stat__caption{
+  margin-top:4px;
+  font-size:.82rem;
+  color:var(--text-muted);
+}
+
+/* ---------------------------------------------------------------- */
+/* Responsive                                                           */
+/* ---------------------------------------------------------------- */
+@media (max-width: 720px){
+  .dash-grid{ grid-template-columns:1fr; }
+  .dash-header{ padding:16px 20px; }
+  .dash-main{ padding:32px 20px 48px; }
+}
+
+/* ---------------------------------------------------------------- */
+/* Panneau admin — Gestion des membres                                  */
+/* ---------------------------------------------------------------- */
+.admin-panel{
+  margin-top:40px;
+  background:var(--card);
+  border-radius:var(--radius-m);
+  padding:28px clamp(20px, 4vw, 32px);
+  box-shadow:0 20px 50px -32px rgba(14,42,51,.35);
+}
+
+.admin-panel__head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+  margin-bottom:22px;
+}
+.admin-panel__head h2{
+  font-family:var(--font-display);
+  font-size:1.25rem;
+  font-weight:700;
+  margin:4px 0 6px;
+}
+.admin-panel__head .lede{ font-size:.86rem; margin:0; max-width:46ch; }
+
+.btn-primary--small{
+  padding:10px 18px;
+  font-size:.84rem;
+  width:auto;
+  white-space:nowrap;
+}
+.btn-primary{
+  border:none;
+  border-radius:var(--radius-s);
+  background:var(--orange);
+  color:#fff;
+  font-family:var(--font-display);
+  font-weight:700;
+  cursor:pointer;
+  transition:background .2s ease;
+}
+.btn-primary:hover{ background:var(--orange-dim); }
+
+.btn-ghost{
+  border:1.5px solid #dfe0d8;
+  background:transparent;
+  border-radius:var(--radius-s);
+  padding:10px 16px;
+  font-family:var(--font-body);
+  font-size:.84rem;
+  font-weight:600;
+  color:var(--text-muted);
+  cursor:pointer;
+}
+.btn-ghost:hover{ border-color:var(--text-muted); color:var(--text-dark); }
+
+/* -------- formulaire d'ajout / édition -------- */
+.member-form{
+  background:#fbfaf6;
+  border:1.5px dashed #dfe0d8;
+  border-radius:var(--radius-s);
+  padding:20px;
+  margin-bottom:24px;
+}
+.member-form__row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-bottom:16px;
+}
+.member-form .field{ margin-bottom:0; }
+.member-form label{
+  display:block;
+  font-family:var(--font-mono);
+  font-size:.68rem;
+  font-weight:600;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin-bottom:6px;
+}
+.member-form input[type="text"],
+.member-form input[type="email"],
+.member-form select{
+  width:100%;
+  border:1.5px solid #dfe0d8;
+  border-radius:var(--radius-s);
+  background:#fff;
+  padding:9px 10px;
+  font-family:var(--font-body);
+  font-size:.9rem;
+  color:var(--text-dark);
+}
+.member-form input:focus,
+.member-form select:focus{ outline:none; border-color:var(--orange); }
+
+.member-form .checkbox{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:.85rem;
+  color:var(--text-muted);
+  margin-bottom:16px;
+  cursor:pointer;
+}
+.member-form .checkbox input{ accent-color:var(--orange); width:15px; height:15px; }
+
+.member-form__actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+/* -------- tableau des membres -------- */
+.member-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.88rem;
+}
+.member-table th{
+  text-align:left;
+  font-family:var(--font-mono);
+  font-size:.68rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--text-faint);
+  padding:0 10px 10px;
+  border-bottom:1.5px solid #eceae1;
+}
+.member-table td{
+  padding:12px 10px;
+  border-bottom:1px solid #f0eee6;
+  color:var(--text-dark);
+}
+.member-table tr:last-child td{ border-bottom:none; }
+
+.tag-role{
+  display:inline-block;
+  padding:3px 9px;
+  border-radius:999px;
+  font-size:.74rem;
+  font-weight:600;
+  text-transform:capitalize;
+}
+.tag-role--apprenant{ background:rgba(95,201,184,.14); color:#2f7d70; }
+.tag-role--personnel{ background:rgba(228,87,46,.1); color:var(--orange-dim); }
+
+.tag-admin{
+  display:inline-block;
+  margin-left:6px;
+  padding:2px 7px;
+  border-radius:999px;
+  background:var(--blueprint-900);
+  color:#eaf3f1;
+  font-size:.66rem;
+  font-family:var(--font-mono);
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+
+.link-action{
+  border:none;
+  background:none;
+  padding:0;
+  margin-right:14px;
+  font-size:.82rem;
+  color:var(--text-muted);
+  text-decoration:underline;
+  cursor:pointer;
+}
+.link-action:hover{ color:var(--orange-dim); }
+.link-action--danger:hover{ color:#c0392b; }
+
+.member-empty{
+  text-align:center;
+  padding:24px 0;
+  font-size:.88rem;
+  color:var(--text-faint);
+}
+
+@media (max-width: 560px){
+  .member-form__row{ grid-template-columns:1fr; }
+  .admin-panel{ padding:22px 18px; }
+}
+
+/* -------- QR codes de point de contrôle -------- */
+.qr-grid{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:20px;
+}
+.qr-card{
+  background:#fbfaf6;
+  border:1.5px solid #eceae1;
+  border-radius:var(--radius-s);
+  padding:22px;
+  text-align:center;
+}
+.qr-card h3{
+  font-family:var(--font-display);
+  font-size:.95rem;
+  font-weight:600;
+  margin:0 0 16px;
+  color:var(--text-dark);
+}
+.qr-image{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 14px;
+  padding:12px;
+  background:#fff;
+  border-radius:8px;
+  width:fit-content;
+  box-shadow:0 12px 30px -20px rgba(14,42,51,.4);
+}
+.qr-meta{
+  margin:0 0 16px;
+  font-family:var(--font-mono);
+  font-size:.72rem;
+  color:var(--text-muted);
+}
+.qr-card__actions{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.qr-card__actions .btn-primary--small{ width:auto; }
+
+@media (max-width: 640px){
+  .qr-grid{ grid-template-columns:1fr; }
+}

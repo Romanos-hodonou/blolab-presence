@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scanner le point de contrôle — BloLab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/Styles/scan.css">
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+
+  <div class="scan-page">
+    <div class="grid-overlay" aria-hidden="true"></div>
+
+    <header class="scan-header">
+      <a href="login.html" class="wordmark" id="scan-back" aria-label="Accueil BloLab">
+        <svg viewBox="0 0 28 28" class="wordmark__icon" aria-hidden="true">
+          <polygon points="14,2 25,8 25,20 14,26 3,20 3,8" fill="none" stroke="currentColor" stroke-width="1.4"/>
+          <circle cx="14" cy="14" r="3" fill="currentColor"/>
+          <line x1="14" y1="2" x2="14" y2="11" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="25" y1="8" x2="16.5" y2="12.5" stroke="currentColor" stroke-width="1.2"/>
+          <line x1="3" y1="8" x2="11.5" y2="12.5" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+        BloLab
+      </a>
+      <a href="login.html" class="exit-link" id="exit-link">Quitter</a>
+    </header>
+
+    <main class="scan-main">
+      <span class="eyebrow">BL / 03 — CONTRÔLE D’ACCÈS</span>
+      <h1 id="scan-title">Scannez le QR du point de contrôle</h1>
+      <p class="lede" id="scan-lede">Scannez le QR code affiché à l’entrée pour valider votre accès.</p>
+
+      <div class="viewfinder" id="viewfinder">
+        <div class="viewfinder__frame">
+          <div id="reader"></div>
+
+          <span class="corner corner--tl"></span>
+          <span class="corner corner--tr"></span>
+          <span class="corner corner--bl"></span>
+          <span class="corner corner--br"></span>
+          <div class="scan-line" id="scan-line"></div>
+
+          <svg class="success-check" id="success-check" viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="32" r="30" fill="none" stroke="currentColor" stroke-width="3" class="check-circle"/>
+            <path d="M20 33l8 8 16-18" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" class="check-mark"/>
+          </svg>
+        </div>
+        <p class="viewfinder__status" id="status-text">Caméra en attente…</p>
+      </div>
+
+      <button type="button" class="btn-primary" id="camera-btn">
+        Activer la caméra pour scanner
+      </button>
+
+      <p class="hint" id="hint-text">Votre navigateur va demander l’autorisation d’utiliser votre position et la caméra. Le scan n’est possible que depuis BloLab. Rien n’est envoyé à un serveur, tout est vérifié localement.</p>
+      <p class="error-text" id="error-text" hidden></p>
+    </main>
+  </div>
+
+  <script src="/JS/scan.js"></script>
+</body>
+</html>
