@@ -4,8 +4,8 @@
    l'adresse), clic droit sur le point exact du bâtiment → les
    coordonnées s'affichent en haut, prêtes à copier.
    --------------------------------------------------------------- */
-var BLOLAB_LAT = 6.3703;          // ⚠️ placeholder — latitude réelle à renseigner
-var BLOLAB_LNG = 2.3912;          // ⚠️ placeholder — longitude réelle à renseigner
+var BLOLAB_LAT = 6.3888;          // ⚠️ placeholder — latitude réelle à renseigner
+var BLOLAB_LNG = 2.4611;          // ⚠️ placeholder — longitude réelle à renseigner
 var MAX_DISTANCE_METERS = 150;    // rayon toléré autour du point ci-dessus (marge pour l'imprécision GPS)
 
 function haversineMeters(lat1, lon1, lat2, lon2) {
