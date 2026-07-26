@@ -31,4 +31,11 @@ async function login(req, res) {
   });
 }
 
-module.exports = { login };
+async function me(req, res) {
+  const [rows] = await pool.query("SELECT id, email, nom, prenom, role FROM users WHERE id = ?", [req.user.id]);
+  if (rows.length === 0) {
+    return res.status(404).json({ error: "Utilisateur non trouve" });
+  }
+  res.json(rows[0]);
+}
+module.exports = { login, me };
