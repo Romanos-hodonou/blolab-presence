@@ -1,58 +1,48 @@
-// Démo front-end : lit la session simulée créée à la connexion/inscription.
-var session = null;
-try { session = JSON.parse(localStorage.getItem('blolab_session')); } catch (err) {}
+/* ---------------------------------------------------------------
+   dashboard.js — logique d'affichage uniquement. Toute la logique
+   métier (membres, points de contrôle, présences) vient désormais
+   de api.js, chargé avant ce fichier.
+   --------------------------------------------------------------- */
+
+var session = getSession();
 
 if (!session) {
   window.location.href = 'login.html';
 } else {
-  var name = session.name || session.email || 'Personnel';
-  document.getElementById('welcome-title').textContent = 'Bonjour, ' + name.split('@')[0].split(' ')[0] + '.';
-  document.getElementById('dash-user').textContent = name.split('@')[0] + (session.isAdmin ? ' — Admin' : ' — Personnel');
+  var displayName = session.name || session.email || 'Personnel';
+  document.getElementById('welcome-title').textContent = 'Bonjour, ' + displayName.split('@')[0].split(' ')[0] + '.';
+  document.getElementById('dash-user').textContent = displayName.split('@')[0] + (session.isAdmin ? ' — Admin' : ' — Personnel');
 }
 
 document.getElementById('logout-link').addEventListener('click', function (e) {
   e.preventDefault();
-  try { localStorage.removeItem('blolab_session'); } catch (err) {}
+  logout();
   window.location.href = 'login.html';
 });
 
 /* ---------------------------------------------------------------
    Carte "Mon accès aujourd'hui"
    --------------------------------------------------------------- */
-function todayKey() {
-  var d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-}
-function quotaFor(role) { return role === 'personnel' ? 2 : 1; }
-
-if (session) {
+(async function renderAccessStatus() {
+  if (!session) return;
   var quota = quotaFor(session.role);
-  var log = [];
-  try { log = JSON.parse(localStorage.getItem('blolab_scanlog:' + session.email + ':' + todayKey())) || []; } catch (err) {}
-  var count = log.length;
+  var log = await getScanLog(session.email);
   var statusEl = document.getElementById('access-status-text');
-  if (count >= quota) {
-    statusEl.textContent = 'Entrée validée (' + count + '/' + quota + ') ✅';
+  if (log.length >= quota) {
+    statusEl.textContent = 'Entrée validée (' + log.length + '/' + quota + ') ✅';
   } else {
     statusEl.innerHTML = 'Pas encore scanné aujourd’hui (0/' + quota + '). <a href="scan.html">Scanner maintenant →</a>';
   }
-}
+})();
 
 /* ---------------------------------------------------------------
    Panneau admin : Gestion des membres
-   (localStorage sert de base de données de démonstration)
    --------------------------------------------------------------- */
 if (session && session.isAdmin) {
   document.getElementById('admin-panel').hidden = false;
   document.getElementById('qr-panel').hidden = false;
-}
-
-function getMembers() {
-  try { return JSON.parse(localStorage.getItem('blolab_members')) || []; }
-  catch (err) { return []; }
-}
-function saveMembers(members) {
-  try { localStorage.setItem('blolab_members', JSON.stringify(members)); } catch (err) {}
+  document.getElementById('attendance-apprenants-section').hidden = false;
+  document.getElementById('attendance-personnel-section').hidden = false;
 }
 
 var tableBody   = document.getElementById('member-table-body');
@@ -67,8 +57,8 @@ var roleField   = document.getElementById('member-role');
 var detailField = document.getElementById('member-detail');
 var adminField  = document.getElementById('member-admin');
 
-function renderMembers() {
-  var members = getMembers();
+async function renderMembers() {
+  var members = await getMembers();
   tableBody.innerHTML = '';
   emptyState.hidden = members.length > 0;
 
@@ -108,12 +98,13 @@ cancelBtn.addEventListener('click', function () {
   resetForm();
 });
 
-tableBody.addEventListener('click', function (e) {
+tableBody.addEventListener('click', async function (e) {
   var editId = e.target.getAttribute('data-edit');
   var deleteId = e.target.getAttribute('data-delete');
 
   if (editId) {
-    var member = getMembers().find(function (m) { return m.id === editId; });
+    var members = await getMembers();
+    var member = members.find(function (m) { return m.id === editId; });
     if (!member) return;
     idField.value = member.id;
     nameField.value = member.name;
@@ -128,74 +119,46 @@ tableBody.addEventListener('click', function (e) {
 
   if (deleteId) {
     if (!confirm('Supprimer ce membre ?')) return;
-    var members = getMembers().filter(function (m) { return m.id !== deleteId; });
-    saveMembers(members);
+    await deleteMember(deleteId);
     renderMembers();
+    renderAttendance();
   }
 });
 
-form.addEventListener('submit', function (e) {
+form.addEventListener('submit', async function (e) {
   e.preventDefault();
-  var members = getMembers();
   var isEditing = !!idField.value;
 
   var record = {
-    id: isEditing ? idField.value : 'm_' + Date.now(),
     name: nameField.value.trim(),
     email: emailField.value.trim(),
     role: roleField.value,
     detail: detailField.value.trim(),
-    isAdmin: adminField.checked,
-    createdAt: new Date().toISOString()
+    isAdmin: adminField.checked
   };
 
   if (isEditing) {
-    members = members.map(function (m) { return m.id === record.id ? record : m; });
+    await updateMember(idField.value, record);
   } else {
-    members.push(record);
+    await createMember(record);
   }
 
-  saveMembers(members);
   renderMembers();
+  renderAttendance();
   form.hidden = true;
   resetForm();
 });
 
-renderMembers();
+if (session && session.isAdmin) {
+  renderMembers();
+}
 
 /* ---------------------------------------------------------------
    Génération des QR codes de point de contrôle
-   Contenu encodé : blolab://checkpoint/<role>/<token>
    --------------------------------------------------------------- */
-var checkpointLabels = { apprenant: 'la salle de formation', personnel: 'les bureaux du personnel' };
-
-function genToken() {
-  return Math.random().toString(36).slice(2, 8).toUpperCase() + Date.now().toString(36).slice(-4).toUpperCase();
-}
-function getCheckpoints() {
-  try { return JSON.parse(localStorage.getItem('blolab_checkpoints')) || {}; }
-  catch (err) { return {}; }
-}
-function saveCheckpoints(cp) {
-  try { localStorage.setItem('blolab_checkpoints', JSON.stringify(cp)); } catch (err) {}
-}
-function ensureCheckpoints() {
-  var cp = getCheckpoints();
-  var changed = false;
-  ['apprenant', 'personnel'].forEach(function (role) {
-    if (!cp[role]) { cp[role] = { token: genToken(), generatedAt: new Date().toISOString() }; changed = true; }
-  });
-  if (changed) saveCheckpoints(cp);
-  return cp;
-}
-function formatDate(iso) {
-  var d = new Date(iso);
-  return d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-}
-
-function renderCheckpointQR(role) {
-  var cp = getCheckpoints();
-  var entry = cp[role];
+async function renderCheckpointQR(role) {
+  var checkpoints = await getCheckpoints();
+  var entry = checkpoints[role];
   var container = document.getElementById('qr-' + role);
   container.innerHTML = '';
 
@@ -205,7 +168,7 @@ function renderCheckpointQR(role) {
   }
 
   new QRCode(container, {
-    text: 'blolab://checkpoint/' + role + '/' + entry.token,
+    text: buildCheckpointPayload(role, entry.token),
     width: 160,
     height: 160,
     colorDark: '#0e2a33',
@@ -213,22 +176,21 @@ function renderCheckpointQR(role) {
     correctLevel: QRCode.CorrectLevel.H
   });
 
+  var d = new Date(entry.generatedAt);
+  var formatted = d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
   document.getElementById('qr-' + role + '-meta').textContent =
-    'Généré le ' + formatDate(entry.generatedAt) + ' — affiché devant ' + checkpointLabels[role];
+    'Généré le ' + formatted + ' — affiché devant ' + CHECKPOINT_LABELS[role];
 }
 
 if (session && session.isAdmin) {
-  ensureCheckpoints();
   renderCheckpointQR('apprenant');
   renderCheckpointQR('personnel');
 
   document.querySelectorAll('[data-regenerate]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', async function () {
       var role = btn.getAttribute('data-regenerate');
       if (!confirm('Régénérer ce code rendra l’affichage actuel invalide pour les prochains scans. Continuer ?')) return;
-      var cp = getCheckpoints();
-      cp[role] = { token: genToken(), generatedAt: new Date().toISOString() };
-      saveCheckpoints(cp);
+      await regenerateCheckpoint(role);
       renderCheckpointQR(role);
     });
   });
@@ -276,39 +238,33 @@ function splitName(full) {
 function fmtTime(iso) {
   return iso ? new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—';
 }
-function memberScanLog(email) {
-  try { return JSON.parse(localStorage.getItem('blolab_scanlog:' + email + ':' + todayKey())) || []; }
-  catch (err) { return []; }
-}
 
-function renderAttendance() {
-  var members = getMembers();
-
-  var apprenants = members.filter(function (m) { return m.role === 'apprenant'; });
+async function renderAttendance() {
+  var apprenants = await getAttendance('apprenant');
   var appBody = document.getElementById('attendance-apprenants-body');
   appBody.innerHTML = '';
-  apprenants.forEach(function (m) {
-    var n = splitName(m.name);
-    var log = memberScanLog(m.email);
+  apprenants.forEach(function (row) {
+    var n = splitName(row.name);
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td>' + n.nom + '</td><td>' + n.prenom + '</td><td>' + fmtTime(log[0]) + '</td>';
+    tr.innerHTML = '<td>' + n.nom + '</td><td>' + n.prenom + '</td><td>' + fmtTime(row.arrival) + '</td>';
     appBody.appendChild(tr);
   });
   document.getElementById('attendance-apprenants-empty').hidden = apprenants.length > 0;
 
-  var personnel = members.filter(function (m) { return m.role === 'personnel'; });
+  var personnel = await getAttendance('personnel');
   var persBody = document.getElementById('attendance-personnel-body');
   persBody.innerHTML = '';
-  personnel.forEach(function (m) {
-    var n = splitName(m.name);
-    var log = memberScanLog(m.email);
+  personnel.forEach(function (row) {
+    var n = splitName(row.name);
     var tr = document.createElement('tr');
-    tr.innerHTML = '<td>' + n.nom + '</td><td>' + n.prenom + '</td><td>' + fmtTime(log[0]) + '</td><td>' + fmtTime(log[1]) + '</td>';
+    tr.innerHTML = '<td>' + n.nom + '</td><td>' + n.prenom + '</td><td>' + fmtTime(row.arrival) + '</td><td>' + fmtTime(row.departure) + '</td>';
     persBody.appendChild(tr);
   });
   document.getElementById('attendance-personnel-empty').hidden = personnel.length > 0;
 }
-renderAttendance();
+if (session && session.isAdmin) {
+  renderAttendance();
+}
 
 function printTable(tableId, title) {
   var table = document.getElementById(tableId);

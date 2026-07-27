@@ -101,41 +101,29 @@ pwd.addEventListener('input', function () {
   });
 });
 
-function upsertMember(member) {
-  var members = [];
-  try { members = JSON.parse(localStorage.getItem('blolab_members')) || []; } catch (err) {}
-  var idx = members.findIndex(function (m) { return m.email.toLowerCase() === member.email.toLowerCase(); });
-  if (idx > -1) { members[idx] = member; } else { members.push(member); }
-  try { localStorage.setItem('blolab_members', JSON.stringify(members)); } catch (err) {}
-}
-
-document.getElementById('signup-form').addEventListener('submit', function (e) {
+document.getElementById('signup-form').addEventListener('submit', async function (e) {
   e.preventDefault();
   var role = roleInput.value;
   var name = nameInput.value;
   var email = document.getElementById('email').value;
-  var isAdmin = role === 'personnel' && document.getElementById('is-admin').checked;
+  var isAdminRequested = role === 'personnel' && document.getElementById('is-admin').checked;
   var detail = role === 'apprenant'
     ? programmeSelect.options[programmeSelect.selectedIndex].text
     : posteSelect.options[posteSelect.selectedIndex].text;
 
-  var member = {
-    id: 'm_' + Date.now(),
-    name: name, email: email, role: role, detail: detail, isAdmin: isAdmin,
-    createdAt: new Date().toISOString()
-  };
-
-  // Démo front-end uniquement : simule une inscription + une session locale.
-  // À remplacer par une vraie création de compte côté serveur.
-  upsertMember(member);
-  try {
-    localStorage.setItem('blolab_session', JSON.stringify({ role: role, name: name, email: email, isAdmin: isAdmin }));
-  } catch (err) { /* stockage indisponible, on continue sans */ }
-
   var btn = e.target.querySelector('.btn-primary');
   btn.classList.add('is-loading');
   btn.disabled = true;
-  setTimeout(function () {
-    window.location.href = 'scan.html';
-  }, 650);
+
+  try {
+    // signup() vient de api.js : crée le membre et la session en une seule
+    // étape. ⚠️ isAdminRequested est purement indicatif ici (mode démo) —
+    // un vrai backend doit toujours ignorer ce champ à l'inscription.
+    await signup({ name: name, email: email, password: document.getElementById('password').value, role: role, detail: detail, isAdminRequested: isAdminRequested });
+    setTimeout(function () { window.location.href = 'scan.html'; }, 400);
+  } catch (err) {
+    btn.classList.remove('is-loading');
+    btn.disabled = false;
+    alert(err.message || 'Inscription impossible pour le moment.');
+  }
 });

@@ -60,33 +60,22 @@ roleButtons.forEach(function (b) {
   b.addEventListener('click', function () { setRole(b.dataset.role); });
 });
 
-function findMemberByEmail(email) {
-  var members = [];
-  try { members = JSON.parse(localStorage.getItem('blolab_members')) || []; } catch (err) {}
-  return members.find(function (m) { return m.email.toLowerCase() === (email || '').toLowerCase(); }) || null;
-}
-
-document.getElementById('login-form').addEventListener('submit', function (e) {
+document.getElementById('login-form').addEventListener('submit', async function (e) {
   e.preventDefault();
   var email = document.getElementById('email').value;
-  var member = findMemberByEmail(email);
-
-  // Démo front-end uniquement : simule une session locale.
-  // Si l'e-mail correspond à un membre déjà connu (auto-inscrit ou ajouté par un admin),
-  // on reprend son rôle réel plutôt que le sélecteur — à remplacer par une vraie authentification.
-  var role = member ? member.role : roleInput.value;
-  var sessionData = {
-    role: role,
-    email: email,
-    name: member ? member.name : '',
-    isAdmin: member ? !!member.isAdmin : false
-  };
-  try { localStorage.setItem('blolab_session', JSON.stringify(sessionData)); } catch (err) {}
-
   var btn = e.target.querySelector('.btn-primary');
   btn.classList.add('is-loading');
   btn.disabled = true;
-  setTimeout(function () {
-    window.location.href = 'scan.html';
-  }, 650);
+
+  try {
+    // login() vient de api.js : retrouve le membre existant si son e-mail
+    // est connu, sinon utilise le rôle sélectionné dans l'interrupteur
+    // Apprenant/Personnel comme repli — et enregistre la session.
+    await login(email, undefined, roleInput.value);
+    setTimeout(function () { window.location.href = 'scan.html'; }, 400);
+  } catch (err) {
+    btn.classList.remove('is-loading');
+    btn.disabled = false;
+    alert(err.message || 'Connexion impossible pour le moment.');
+  }
 });
